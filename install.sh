@@ -7,16 +7,16 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Install Dependencies
-apt update && apt upgrade && apt install dnsmasq unbound curl -y
+apt update && apt upgrade && apt install git curl -y
 
-mkdir -p /etc/unbound/unbound.conf.d/ && mkdir -p /etc/pihole/ && mkdir -p /etc/dnsmasq.d/
-touch /etc/dnsmasq.d/99-edns.conf && echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
-
-cp configs/unbound.conf /etc/unbound/unbound.conf.d/
-cp configs/pihole.conf etc/unbound/unbound.conf.d/
-cp configs/setupVars.conf /etc/pihole/
+mkdir -p /etc/pihole/ && cp configs/setupVars.conf /etc/pihole/
 source /etc/pihole/setupVars.conf
-RUN curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+
+apt install unbound -y
+mkdir -p /etc/unbound/unbound.conf.d/  && mkdir -p /etc/dnsmasq.d/
+touch /etc/dnsmasq.d/99-edns.conf && echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
+cp configs/pihole.conf etc/unbound/unbound.conf.d/
 
 sudo systemctl disable --now unbound-resolvconf.service
 sudo sed -Ei 's/^unbound_conf=/#unbound_conf=/' /etc/resolvconf.conf
