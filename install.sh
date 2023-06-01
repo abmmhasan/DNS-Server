@@ -7,16 +7,21 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Install Dependencies
-apt update && apt upgrade && apt install git curl -y
+sudo apt update
+sudo apt upgrade -y
+sudo apt install git curl -y
 
-mkdir -p /etc/pihole/ && cp configs/setupVars.conf /etc/pihole/
+sudo mkdir -p /etc/pihole/
+sudo cp configs/setupVars.conf /etc/pihole/
 source /etc/pihole/setupVars.conf
-curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+sudo curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
 
-apt install unbound -y
-mkdir -p /etc/unbound/unbound.conf.d/  && mkdir -p /etc/dnsmasq.d/
-touch /etc/dnsmasq.d/99-edns.conf && echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
-cp configs/pihole.conf etc/unbound/unbound.conf.d/
+sudo apt install unbound -y
+sudo mkdir -p /etc/unbound/unbound.conf.d/
+sudo mkdir -p /etc/dnsmasq.d/
+sudo touch /etc/dnsmasq.d/99-edns.conf
+sudo echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
+sudo cp configs/pihole.conf etc/unbound/unbound.conf.d/
 
 sudo systemctl disable --now unbound-resolvconf.service
 sudo sed -Ei 's/^unbound_conf=/#unbound_conf=/' /etc/resolvconf.conf
@@ -24,4 +29,5 @@ sudo rm /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
 
 sudo service unbound restart
 
-apt clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+sudo apt clean
+sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
