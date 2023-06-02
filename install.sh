@@ -26,6 +26,7 @@ mkdir -p /etc/pihole/
 cp configs/setupVars.conf /etc/pihole/
 chmod -R 644 /etc/pihole/setupVars.conf
 source /etc/pihole/setupVars.conf
+useradd -ms /bin/bash pi-serve && export USER=pi-serve
 curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
 
 apt clean
