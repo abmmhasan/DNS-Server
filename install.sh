@@ -7,27 +7,26 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Install Dependencies
-sudo apt update
-sudo apt upgrade -y
-sudo apt install git curl -y
+apt update
+apt upgrade -y
+apt install git curl unbound sudo dnsmasq  -y
 
-sudo mkdir -p /etc/pihole/
-sudo cp configs/setupVars.conf /etc/pihole/
-source /etc/pihole/setupVars.conf
-sudo curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
+chmod -R 644 /etc/dnsmasq.d/99-edns.conf
+cp configs/pihole.conf /etc/unbound/unbound.conf.d/
+chmod -R 644 /etc/unbound/unbound.conf.d/pihole.conf
 
-sudo apt install unbound -y
-sudo mkdir -p /etc/unbound/unbound.conf.d/
-sudo mkdir -p /etc/dnsmasq.d/
-sudo touch /etc/dnsmasq.d/99-edns.conf
-sudo echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
-sudo cp configs/pihole.conf etc/unbound/unbound.conf.d/
-
-sudo systemctl disable --now unbound-resolvconf.service
+sudo service unbound-resolvconf stop
+sudo chkconfig unbound-resolvconf off
 sudo sed -Ei 's/^unbound_conf=/#unbound_conf=/' /etc/resolvconf.conf
 sudo rm /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
-
 sudo service unbound restart
 
-sudo apt clean
+mkdir -p /etc/pihole/
+cp configs/setupVars.conf /etc/pihole/
+chmod -R 644 /etc/pihole/setupVars.conf
+source /etc/pihole/setupVars.conf
+curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+
+apt clean
 sudo rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
