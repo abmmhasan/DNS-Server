@@ -32,8 +32,8 @@ curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
 printf "Configuring DNSMasq\n"
 echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
 chmod -R 644 /etc/dnsmasq.d/99-edns.conf
-/etc/init.d/dnsmasq restart
-service network-manager restart
+/etc/init.d/dnsmasq restart &>/dev/null
+service network-manager restart &>/dev/null
 
 apt clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
