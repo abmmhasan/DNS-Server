@@ -10,7 +10,7 @@ fi
 printf "Installing Dependencies\n"
 apt update
 apt upgrade -y
-apt install git wget curl unbound sudo net-tools gamin sysv-rc-conf lighttpd lighttpd-mod-deflate -y
+apt install git wget curl unbound net-tools sysv-rc-conf lighttpd lighttpd-mod-deflate -y
 
 printf "Configuring Unbound\n"
 cp configs/pi-hole.conf /etc/unbound/unbound.conf.d/
@@ -32,8 +32,6 @@ curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
 printf "Configuring DNSMasq\n"
 echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
 chmod -R 644 /etc/dnsmasq.d/99-edns.conf
-/etc/init.d/dnsmasq restart &>/dev/null
-service network-manager restart &>/dev/null
 
 apt clean
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
