@@ -9,7 +9,8 @@ fi
 # Install Dependencies
 printf "Installing Dependencies\n"
 apt update
-apt install git wget curl unbound net-tools -y
+apt upgrade -y
+apt install curl unbound -y
 
 printf "Configuring Unbound\n"
 cp configs/pi-hole.conf /etc/unbound/unbound.conf.d/
