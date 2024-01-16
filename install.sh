@@ -9,7 +9,6 @@ fi
 # Install Dependencies
 printf "Installing Dependencies\n"
 apt update
-apt upgrade -y
 apt install curl unbound -y
 
 printf "Configuring Unbound\n"
