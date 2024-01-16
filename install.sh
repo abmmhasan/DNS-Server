@@ -9,16 +9,11 @@ fi
 # Install Dependencies
 printf "Installing Dependencies\n"
 apt update
-apt upgrade -y
-apt install git wget curl unbound net-tools sysv-rc-conf lighttpd lighttpd-mod-deflate -y
+apt install git wget curl unbound net-tools -y
 
 printf "Configuring Unbound\n"
 cp configs/pi-hole.conf /etc/unbound/unbound.conf.d/
 chmod -R 644 /etc/unbound/unbound.conf.d/pi-hole.conf
-service unbound-resolvconf stop
-sysv-rc-conf unbound-resolvconf off
-sed -Ei 's/^unbound_conf=/#unbound_conf=/' /etc/resolvconf.conf
-rm /etc/unbound/unbound.conf.d/resolvconf_resolvers.conf
 service unbound restart
 
 printf "Setup Pi-hole\n"
