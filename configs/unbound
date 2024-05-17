@@ -1,0 +1,9 @@
+/var/log/unbound/unbound.log {
+    daily  # Rotate the log file daily
+    rotate 7  # Keep 7 old compressed logs (optional)
+    compress  # Compress old logs (optional)
+    missingok  # Don't create the file if it's missing
+    notifempty  # Don't rotate if the log file is empty
+    create 644 unbound unbound  # Set ownership and permissions
+    postrotate /etc/init.d/unbound reload  # Reload Unbound after rotation (optional)
+}

@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Define Unbound log file path (adjust as needed)
+UNBOUND_LOG="/var/log/unbound/unbound.log"
+
+# Loop through Unbound log entries
+tail -f "$UNBOUND_LOG" | grep -E '^client ([0-9.]+):[0-9]+ type: A? NS (.*)$' | while read -r _ clienthost domain; do
+  # Check if NS query failed (look for SERVFAIL)
+  if grep -q "SERVFAIL" "$UNBOUND_LOG"; then
+    echo "Direct NS query for $domain failed. Forwarding..."
+    # Perform forward query for NS records
+    ns_records=dig +short @1.1.1.1 "$domain" NS
+    # Check if forward query succeeded
+    if [ "$ns_records" -eq 0 ]; then
+      echo "Forward query successful: $ns_records"
+      # (Optional) Log or process the obtained NS records
+    else
+      echo "Error forwarding query for $domain"
+    fi
+  fi
+done

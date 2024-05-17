@@ -9,11 +9,25 @@ fi
 # Install Dependencies
 printf "Installing Dependencies\n"
 apt update
-apt install curl unbound -y
+apt install curl wget unbound unbound-anchor logrotate ntp -y
+
+printf "Configuring NTP\n"
+systemctl start ntpd
+systemctl enable ntpd
 
 printf "Configuring Unbound\n"
+cp configs/unbound /etc/logrotate.d/
 cp configs/pi-hole.conf /etc/unbound/unbound.conf.d/
+cp configs/forwardFailed /bin
+chmod +x /etc/logrotate.d/unbound
+chmod +x /bin/forwardFailed
 chmod -R 644 /etc/unbound/unbound.conf.d/pi-hole.conf
+unbound-anchor
+unbound-anchor -v
+wget -O "/etc/unbound/root.zone" "https://www.internic.net/domain/root.zone"
+wget -O "/etc/unbound/root.hints" "https://www.internic.net/domain/named.root"
+chmod -R 644 /etc/unbound/root.zone
+chmod -R 644 /etc/unbound/root.hints
 service unbound restart
 
 printf "Setup Pi-hole\n"
@@ -22,7 +36,7 @@ cp configs/setupVars.conf /etc/pihole/
 chmod -R 644 /etc/pihole/setupVars.conf
 source /etc/pihole/setupVars.conf
 useradd -ms /bin/bash pi-hole && export USER=pi-hole
-curl -sSL https://install.pi-hole.net | bash -sex -- --unattended
+curl -sSL# https://install.pi-hole.net | bash -sex -- --unattended
 
 printf "Configuring DNSMasq\n"
 echo "edns-packet-max=1232" >> /etc/dnsmasq.d/99-edns.conf
