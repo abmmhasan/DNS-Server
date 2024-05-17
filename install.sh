@@ -11,23 +11,22 @@ printf "Installing Dependencies\n"
 apt update
 apt install curl wget unbound unbound-anchor logrotate ntp -y
 
-printf "Configuring NTP\n"
-systemctl start ntpd
-systemctl enable ntpd
-
 printf "Configuring Unbound\n"
-cp configs/unbound /etc/logrotate.d/
-cp configs/pi-hole.conf /etc/unbound/unbound.conf.d/
-cp configs/forwardFailed /bin
+mkdir -p /var/log/unbound
+touch /var/log/unbound/unbound.log
+cp ./configs/unbound /etc/logrotate.d/
+cp ./configs/pi-hole.conf /etc/unbound/unbound.conf.d/
+cp ./configs/forwardFailed /bin
+wget -O "/usr/share/dns/root.zone" "https://www.internic.net/domain/root.zone"
+wget -O "/usr/share/dns/root.hints" "https://www.internic.net/domain/named.root"
 chmod +x /etc/logrotate.d/unbound
 chmod +x /bin/forwardFailed
 chmod -R 644 /etc/unbound/unbound.conf.d/pi-hole.conf
-unbound-anchor
+chown unbound /var/log/unbound/unbound.log
+chown unbound /etc/unbound/root.zone
+chown unbound /etc/unbound/root.hints
+unbound-anchor -a /usr/share/dns/root.key
 unbound-anchor -v
-wget -O "/etc/unbound/root.zone" "https://www.internic.net/domain/root.zone"
-wget -O "/etc/unbound/root.hints" "https://www.internic.net/domain/named.root"
-chmod -R 644 /etc/unbound/root.zone
-chmod -R 644 /etc/unbound/root.hints
 service unbound restart
 
 printf "Setup Pi-hole\n"
